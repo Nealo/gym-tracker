@@ -22,7 +22,7 @@ class Main extends React.Component{
     this.state = {
       currentPlan: 0,
       currentDay: 0,
-      plan: plansData[0],
+      plans: plansData,
       exercises: exerciseData,
       // error: false,
     }
@@ -49,7 +49,7 @@ class Main extends React.Component{
     });
   }
   handleVideoPress(row, e) {
-    let exerciseID  = this.state.plan.days[this.state.currentDay].exercises[row].id;
+    let exerciseID  = this.state.plans[this.state.currentPlan].days[this.state.currentDay].exercises[row].id;
     let exercise = this.state.exercises[exerciseID];
 
     let uri = exercise.video;
@@ -66,7 +66,7 @@ class Main extends React.Component{
   }
 
   handlePlanNameChange(e) {
-    let newPlan = this.state.plan;
+    let newPlan = this.state.plans[this.state.currentPlan];
     newPlan.name = e.nativeEvent.text;
     this.setState({
       plan: newPlan
@@ -154,7 +154,8 @@ class Main extends React.Component{
   }
 
   render() {
-    let plan = this.state.plan;
+    let plans = this.state.plans;
+    let plan = plans[this.state.currentPlan];
     let currentDay = this.state.currentDay;
     let exercises = plan.days[currentDay].exercises;
 

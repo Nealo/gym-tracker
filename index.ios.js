@@ -11,10 +11,14 @@ import {
   NavigatorIOS,
   View,
   Text,
+  AsyncStorage,
 } from 'react-native';
 
 import Main from './App/Components/Main';
 import Plan from './App/Components/Plan';
+
+import plansData from './plans.json';
+import exerciseData from './exercises.json';
 
 class WorkoutTracker extends Component {
   // constructor(props) {
@@ -22,6 +26,19 @@ class WorkoutTracker extends Component {
   // }
 
   render() {
+    AsyncStorage.getItem('plans', (err, plans) => {
+      if (!plans) {
+        AsyncStorage.setItem('plans', JSON.stringify(plansData), () => {
+            AsyncStorage.setItem('exercises', JSON.stringify(exerciseData), () => {
+
+            });
+        });
+
+      } 
+    })
+    // if (!AsyncStorage.getItem('plans') && !AsyncStorage.getItem('exercises')) {
+    //
+    // }
     return (
       <NavigatorIOS
         style={styles.container}

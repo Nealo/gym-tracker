@@ -2,8 +2,6 @@
   {
     "id": 0,
     "name": "Plan A",
-    "sets": 3,
-    "currentDay": 0,
     "days": [
       {
         "id": 0,
@@ -24,7 +22,7 @@
             "id": 2,
             "weight": 20,
             "sets": 3,
-            "unit": "kg"
+            "unit": "lb"
           },
           {
             "id": 3,
@@ -36,7 +34,7 @@
             "id": 4,
             "weight": 10,
             "sets": 4,
-            "unit": "kg"
+            "unit": "lb"
           },
           {
             "id": 5,
@@ -65,7 +63,7 @@
             "id": 8,
             "weight": 20,
             "sets": 3,
-            "unit": "kg"
+            "unit": "lb"
           },
           {
             "id": 9,
@@ -77,7 +75,7 @@
             "id": 10,
             "weight": 10,
             "sets": 4,
-            "unit": "kg"
+            "unit": "lb"
           },
           {
             "id": 11,
@@ -106,7 +104,7 @@
             "id": 14,
             "weight": 20,
             "sets": 3,
-            "unit": "kg"
+            "unit": "lb"
           },
           {
             "id": 15,
@@ -118,7 +116,7 @@
             "id": 16,
             "weight": 10,
             "sets": 4,
-            "unit": "kg"
+            "unit": "lb"
           },
           {
             "id": 17,
@@ -134,19 +132,117 @@
   {
     "id": 1,
     "name": "Plan B",
-    "sets": 4,
     "days": [
       {
         "id": 0,
-        "exercises": [19,20,21,22,23,24,18]
+        "exercises": [
+          {
+            "id": 19,
+            "weight": 150,
+            "sets": 4,
+            "unit": "lb"
+          },
+          {
+            "id": 20,
+            "weight": 150,
+            "sets": 4,
+            "unit": "lb"
+          },
+          {
+            "id": 21,
+            "weight": 150,
+            "sets": 4,
+            "unit": "lb"
+          },
+          {
+            "id": 22,
+            "weight": 150,
+            "sets": 4,
+            "unit": "lb"
+          },
+          {
+            "id": 23,
+            "weight": 150,
+            "sets": 4,
+            "unit": "lb"
+          },
+          {
+            "id": 24,
+            "weight": 150,
+            "sets": 4,
+            "unit": "lb"
+          }
+        ]
       },
       {
         "id": 1,
-        "exercises": [25,26,27,15,8,28]
+        "exercises": [
+          {
+            "id": 25,
+            "weight": 150,
+            "sets": 4,
+            "unit": "lb"
+          },
+          {
+            "id": 26,
+            "weight": 150,
+            "sets": 4,
+            "unit": "lb"
+          },
+          {
+            "id": 27,
+            "weight": 150,
+            "sets": 4,
+            "unit": "lb"
+          },
+          {
+            "id": 15,
+            "weight": 150,
+            "sets": 4,
+            "unit": "lb"
+          },
+          {
+            "id": 8,
+            "weight": 150,
+            "sets": 4,
+            "unit": "lb"
+          },
+          {
+            "id": 28,
+            "weight": 150,
+            "sets": 4,
+            "unit": "lb"
+          }
+        ]
       },
       {
         "id": 2,
-        "exercises": [19,20,21,22]
+        "exercises": [
+          {
+            "id": 19,
+            "weight": 150,
+            "sets": 4,
+            "unit": "lb"
+          },
+          {
+            "id": 20,
+            "weight": 150,
+            "sets": 4,
+            "unit": "lb"
+          },
+          {
+            "id": 21,
+            "weight": 150,
+            "sets": 4,
+            "unit": "lb"
+          },
+          {
+            "id": 22,
+            "weight": 150,
+            "sets": 4,
+            "unit": "lb"
+          },
+        ]
       }
     ]
   }

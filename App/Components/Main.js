@@ -25,10 +25,11 @@ class Main extends React.Component{
     this.state = {
       currentPlan: 0,
       currentDay: 0,
-      // currentExercise: 0,
+      currentExercise: 0,
       plans: plansData,
       exercises: exerciseData,
-      planModalVisible: false
+      planModalVisible: false,
+      exerciseModalVisible: false,
       // error: false,
     };
   }
@@ -87,6 +88,13 @@ class Main extends React.Component{
         exercise: exercise,
         uri: uri
       }
+    })
+  }
+  handleExercisePress(id) {
+    console.log(id);
+    this.setState({
+      currentExercise: id,
+      exerciseModalVisible: true,
     })
   }
 
@@ -327,6 +335,33 @@ class Main extends React.Component{
             <Text>Close Modal</Text>
           </TouchableHighlight>
         </Modal>
+        <Modal
+          animationType={'slide'}
+          visible={this.state.exerciseModalVisible}
+          transparent={false}
+          >
+          <Text>Edit Exercise</Text>
+
+          <View>
+          <Text style={styles.label}>Exercise Name</Text>
+            <TextInput
+              style={{padding: 10, height: 40, borderColor: 'gray', borderWidth: 1}}
+              value={this.state.exercises[this.state.currentExercise].name}
+              onChange={(e) => this.handleExerciseNameChange(this.state.exercises[this.state.currentExercise].id, e)} />
+            <Text style={styles.label}>Video Link</Text>
+            <TextInput
+              style={{padding: 10, height: 40, borderColor: 'gray', borderWidth: 1}}
+              value={this.state.exercises[this.state.currentExercise].video}
+              onChange={(e) => this.handleExerciseVideoChange(this.state.exercises[this.state.currentExercise].id, e)} />
+          </View>
+
+          <TouchableHighlight
+            onPress={() => this.setState({exerciseModalVisible: false})} >
+
+            <Text>Close Modal</Text>
+          </TouchableHighlight>
+
+        </Modal>
 
         <View style={styles.header}>
           <View style={{padding: 5, flex: 3}}>
@@ -357,25 +392,40 @@ class Main extends React.Component{
         </View>
 
         {/*Exercise Section*/}
-        <View style={{flex:8, justifyContent: "flex-start"}}  >
+        <View style={styles.exerciseSection}  >
           <ListView
             dataSource={dataSource}
+            renderFooter={() =>
+              <View style={styles.addExercise}>
+                <TouchableHighlight
+                  onPress={(event) => this.handleAddExercise(event)} >
+                    <Text style={styles.addExerciseText}>Add New Exercise</Text>
+                </TouchableHighlight>
+              </View>
+            }
             renderRow={(exercise, section, row) =>
-              <View>
-                <View>
-                  <TextInput
-                    id={exercise.id}
-                    style={{height:40}}
-                    value={this.getExerciseName(exercise.id)}
-                    onChange={(event) => this.handleExerciseNameChange(exercise.id, event)} />
-                  <TouchableHighlight onPress={(event) => this.handleUnitChange(row, event)}>
-                    <Text>{exercise.unit}</Text>
-                  </TouchableHighlight>
-                  <TouchableHighlight onPress={(event) => this.handleVideoPress(row, event)}>
-                    <Text>Video</Text>
-                  </TouchableHighlight>
+              <View style={styles.exerciseRow}>
+                <View style={styles.exerciseHead}>
+                  <View style={styles.exerciseName}>
+                    <TouchableHighlight
+                      onPress={(event) => this.handleExercisePress(exercise.id)} >
+                      <Text style={styles.exerciseNameText}>
+                        {this.getExerciseName(exercise.id)}
+                      </Text>
+                    </TouchableHighlight>
+
+                  </View>
+
+
+                  <View>
+                    <TouchableHighlight
+                      style={styles.videoLink}
+                      onPress={(event) => this.handleVideoPress(row, event)}>
+                      <Text>Video</Text>
+                    </TouchableHighlight>
+                  </View>
                 </View>
-                <View>
+                <View style={styles.exerciseBody}>
                   {/*Weight Display*/}
                   <TextInput
                     style={styles.weightDisplay}
@@ -383,6 +433,11 @@ class Main extends React.Component{
                     value={exercise.weight.toString()}
                     onChange={(event) => this.handleWeightChange(row, event)} />
                   {/*Set Display*/}
+                    <TouchableHighlight
+                      style={styles.unitChange}
+                      onPress={(event) => this.handleUnitChange(row, event)}>
+                      <Text>{exercise.unit}</Text>
+                    </TouchableHighlight>
                   <Text>x</Text>
                   <TextInput
                     style={styles.setDisplay}
@@ -390,17 +445,21 @@ class Main extends React.Component{
                     value={exercise.sets.toString()}
                     onChange={(event) => this.handleSetChange(row, event)} />
                   {/*Weight Increments*/}
-                  <View>
-                    <TouchableHighlight
-                      style={styles.weightIncrement}
-                      onPress={(event) => this.handleWeightIncrement(row)} >
-                      <Text>+1</Text>
-                    </TouchableHighlight>
-                    <TouchableHighlight
-                      style={styles.weightIncrement}
-                      onPress={(event) => this.handleWeightIncrement(row, true)} >
-                      <Text>+{exercise.unit === "lb" ? "5" : "2.27"}</Text>
-                    </TouchableHighlight>
+                  <View style={styles.weightIncrements}>
+                    <View style={styles.weightIncrementBox}>
+                      <TouchableHighlight
+                        style={styles.weightIncrement}
+                        onPress={(event) => this.handleWeightIncrement(row)} >
+                        <Text>+1</Text>
+                      </TouchableHighlight>
+                    </View>
+                    <View style={styles.weightIncrementBox}>
+                      <TouchableHighlight
+                        style={styles.weightIncrement}
+                        onPress={(event) => this.handleWeightIncrement(row, true)} >
+                        <Text>+{exercise.unit === "lb" ? "5" : "2.27"}</Text>
+                      </TouchableHighlight>
+                    </View>
                   </View>
                   {/*Weight Increments*/}
                 </View>
@@ -408,13 +467,7 @@ class Main extends React.Component{
             }
           />
           {/*ListView*/}
-          <View>
-            <TouchableHighlight
-              style={styles.addExercise}
-              onPress={(event) => this.handleAddExercise(event)} >
-                <Text>Add New Exercise</Text>
-            </TouchableHighlight>
-          </View>
+
         </View>
       </View>
     ); // return
@@ -459,14 +512,18 @@ class Main extends React.Component{
 // }
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    marginTop: 65,
+  },
   header: {
     // height: 50,
     flex: 1,
     flexDirection: "row",
   },
-  mainContainer: {
-    flex: 1,
-    marginTop: 65,
+
+  textInput: {
+    height: 30,
   },
   dayView: {
     flex: 1,
@@ -479,18 +536,39 @@ const styles = StyleSheet.create({
   dayButton: {
 
   },
-  planExercises: {
-    marginTop: 10,
-    marginBottom: 10
+  exerciseSection: {
+    paddingLeft: 5,
+    paddingRight: 5,
+    flex:8,
+    // marginTop: -75,
+    // overflow: 'hidden',
+  },
+  exerciseRow: {
+    marginBottom: 40,
+  },
+  exerciseHead: {
+    flex: 2,
+    flexDirection: 'row',
+    marginBottom: 20,
   },
   exerciseName: {
-
+    flex: 2,
   },
-  addExercise: {
+  exerciseNameText: {
+    fontSize: 20,
+  },
+  unitChange: {
     flex: 1,
-    padding: 10,
+  },
+  videoLink: {
+    flex: 1,
+  },
+  exerciseBody: {
+    flex: 3,
+    flexDirection: 'row',
   },
   weightDisplay: {
+    flex: 1,
     height: 30,
     fontSize: 20,
     textDecorationLine: 'underline',
@@ -498,11 +576,16 @@ const styles = StyleSheet.create({
     fontWeight: '700'
   },
   setDisplay: {
+    flex: 1,
     height:30,
     fontSize:14,
   },
-  unitChange: {
-
+  weightIncrements: {
+    flex: 2,
+    flexDirection: 'row',
+  },
+  weightIncrementBox: {
+    flex: 1,
   },
   weightIncrement: {
     borderWidth: 2,
@@ -511,6 +594,17 @@ const styles = StyleSheet.create({
     padding: 6,
     width: 34,
   },
+  addExercise: {
+    flex: 1,
+    padding: 15,
+    alignItems: 'center',
+    backgroundColor: 'steelblue',
+  },
+  addExerciseText: {
+    fontSize: 20,
+    color: "#fff",
+  },
+
   planPage: {
     padding: 15,
     marginTop: 65,

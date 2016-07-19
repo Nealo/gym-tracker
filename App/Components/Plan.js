@@ -83,6 +83,8 @@ class Plan extends React.Component{
             <Text>Create New Plan</Text>
           </TouchableHighlight>
         </View>
+        <View>
+        </View>
 
 
 

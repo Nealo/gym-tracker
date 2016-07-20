@@ -20,6 +20,12 @@ import Plan from './Plan';
 import Cheatsheet from './Cheatsheet';
 import Video from './Video';
 
+Config = {
+  deletePlanText: "Delete Plan",
+  deleteExerciseText: "Delete Exercise",
+  confirmDeleteText: "Are you sure?"
+}
+
 class Main extends React.Component{
   constructor(props) {
     super(props);
@@ -28,11 +34,19 @@ class Main extends React.Component{
       currentPlan: 0,
       currentDay: 0,
       currentExercise: 0,
+
       plans: plansData,
       exercises: exerciseData,
+
       planModalVisible: false,
       editExerciseModalVisible: false,
       addExerciseModalVisible: false,
+      addExerciseModalMessage: '',
+
+      confirmDelete: false,
+      deletePlanText: Config.deletePlanText,
+      deleteExerciseText: Config.deleteExerciseText,
+      // deleteDayText: "Delete Day"
       // error: false,
     };
   }
@@ -123,7 +137,7 @@ class Main extends React.Component{
     });
     AsyncStorage.setItem('plans', JSON.stringify(this.state.plans))
   }
-  handleNewPlan() {
+  handlePlanNew() {
     let newState = this.state;
     let planID  = newState.plans.length;
     let newPlan = {
@@ -151,15 +165,30 @@ class Main extends React.Component{
     this.setState(newState);
     AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
   }
-  handleDeletePlan(id) {
-    let newState = this.state;
-    newState.plans.forEach((plan, index) => {
-      if (plan.id == id) {
-        newState.plans.splice(index, 1);
-      }
-    });
+  handlePlanDelete(id) {
+    if (!this.state.confirmDelete) {
+      this.setState({
+        confirmDelete: true,
+        deletePlanText: Config.confirmDeleteText,
+      })
+    } else {
+      let newState = this.state;
+
+      newState.plans.forEach((plan, index) => {
+        if (index == newState.currentPlan) {
+          newState.plans.splice(index, 1);
+        }
+      });
+
+      newState.currentPlan = newState.plans.length - 1;
+      newState.confirmDelete = false;
+      newState.deletePlanText = Config.deletePlanText;
+      this.setState(newState);
+      AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
+    }
+
   }
-  handleNewDay() {
+  handleDayNew() {
     let newState = this.state;
     let plan = newState.plans[newState.currentPlan];
     let dayID = plan.days.length;
@@ -174,6 +203,10 @@ class Main extends React.Component{
 
     this.setState(newState);
     AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
+  }
+  handleDayDelete(id) {
+    let newState = this.state;
+
   }
 
   handleDayPress(day) {
@@ -218,30 +251,43 @@ class Main extends React.Component{
     AsyncStorage.setItem('plans', JSON.stringify(newState.plans))
   }
   handleExerciseDelete(id) {
-    // Delete exercise globally
-    let newState = this.state;
+    if (!this.state.confirmDelete) {
+      this.setState({
+        confirmDelete: true,
+        deleteExerciseText: Config.confirmDeleteText,
+      })
+    } else {
+      // Delete exercise globally
+      let newState = this.state;
 
-    // remove exercise from list of exercises
-    newState.exercises.forEach((exercise, index) => {
-      if (exercise.id === id) {
-        newState.exercises.splice(index, 1);
-      }
-    });
+      // remove exercise from list of exercises
+      newState.exercises.forEach((exercise, index) => {
+        if (exercise.id === id) {
+          newState.exercises.splice(index, 1);
+        }
+      });
 
-    // remove exercise from all plans
-    newState.plans.forEach((plan, planIndex) => {
-      plan.days.forEach((day, dayIndex) => {
-        days.exercises.forEach((exercise, exerciseIndex) => {
-          if (exercise.id === id) {
-            newState.plans[planIndex].days[dayIndex].exercises.splice(exerciseIndex, 1);
-          }
+      // remove exercise from all plans
+      newState.plans.forEach((plan, planIndex) => {
+        plan.days.forEach((day, dayIndex) => {
+          day.exercises.forEach((exercise, exerciseIndex) => {
+            if (exercise.id === id) {
+              newState.plans[planIndex].days[dayIndex].exercises.splice(exerciseIndex, 1);
+            }
+          });
         });
       });
-    });
 
-    this.setState(newState);
-    // AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
-    // AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
+      newState.confirmDelete = false;
+      newState.deleteExerciseText = Config.deleteExerciseText;
+      newState.currentExercise = newState.exercises[0].id;
+      newState.editExerciseModalVisible = false;
+
+      this.setState(newState);
+      AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
+      AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
+    }
+
 
   }
   handleExerciseNew() {
@@ -249,7 +295,7 @@ class Main extends React.Component{
     let newState = this.state;
 
     // new ID will be the most recent exercise's ID + 1
-    let newID = newState.exercises[newState.exercise.length-1].id + 1;
+    let newID = newState.exercises[newState.exercises.length-1].id + 1;
 
     newState.exercises[newID] = {
       id: newID,
@@ -257,10 +303,13 @@ class Main extends React.Component{
       video: ""
     }
 
+    newState.currentExercise = newID;
+
     this.setState(newState);
-    // AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
+    AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
   }
   handleExerciseAdd(id) {
+
     // Add exercise to a plan
     let newState = this.state;
     let exerciseLength = newState.plans[newState.currentPlan].days[newState.currentDay].exercises.length;
@@ -273,11 +322,12 @@ class Main extends React.Component{
     }
 
     newState.plans[newState.currentPlan].days[newState.currentDay].exercises[exerciseLength] = newExercise;
-    newState.addExerciseModalVisible = false;
+    newState.addExerciseModalMessage = `${this.getExerciseName(id)} added to plan.`
 
     this.setState(newState);
     AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
   }
+
   handleUnitChange(id, e) {
     let newState = this.state;
 
@@ -323,31 +373,6 @@ class Main extends React.Component{
     this.setState(newState);
     AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
   }
-
-  // handleAddExercise(id, e) {
-  //   let newState = this.state;
-  //   let exerciseLength = newState.plans[newState.currentPlan].days[newState.currentDay].exercises.length;
-  //   let newID = this.state.exercises.length;
-  //
-  //   newState.exercises[newID] = {
-  //     id: newID,
-  //     name: "New Exercise",
-  //     video: ""
-  //   }
-  //
-  //   newState.plans[newState.currentPlan].days[newState.currentDay].exercises[exerciseLength] = {
-  //     id: newID,
-  //     weight: 50,
-  //     sets: 3,
-  //     unit: "lb"
-  //   }
-  //
-  //   // scroll to bottom of list view
-  //
-  //   this.setState(newState);
-  //   AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
-  //   AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
-  // }
 
   render() {
     let plans = this.state.plans;
@@ -414,24 +439,30 @@ class Main extends React.Component{
               </Picker>
             </View>
 
-            <View>
-              <Text style={styles.label}>Plan Name</Text>
-              <TextInput
-                style={{padding: 10, height: 40, borderColor: 'gray', borderWidth: 1}}
-                value={plan.name}
-                onChange={this.handlePlanNameChange.bind(this)} />
+            <View style={styles.form}>
+              <View style={styles.formRow}>
+                <Text style={styles.label}>Plan Name</Text>
+                <TextInput
+                  style={{padding: 10, height: 40, borderColor: 'gray', borderWidth: 1}}
+                  value={plan.name}
+                  onChange={this.handlePlanNameChange.bind(this)} />
+                </View>
             </View>
             <View style={styles.modalFooter}>
               <TouchableHighlight
+                style={[styles.buttonExit, styles.button]}
+                onPress={() => this.setState({planModalVisible: false, confirmDelete: false, deletePlanText: Config.deletePlanText})} >
+                <Text style={styles.buttonText}>Choose Plan</Text>
+              </TouchableHighlight>
+              <TouchableHighlight
                 style={[styles.buttonCreate, styles.button]}
-                onPress={() => this.handleNewPlan()}>
+                onPress={() => this.handlePlanNew()}>
                 <Text style={styles.buttonText}>Create New Plan</Text>
               </TouchableHighlight>
-
               <TouchableHighlight
-                style={[styles.buttonExit, styles.button]}
-                onPress={() => this.setState({planModalVisible: false})} >
-                <Text style={styles.buttonText}>Choose Plan & Close Modal</Text>
+                style={[styles.buttonDelete, styles.button]}
+                onPress={() => this.handlePlanDelete()} >
+                <Text style={styles.buttonText}>{this.state.deletePlanText}</Text>
               </TouchableHighlight>
             </View>
           </View>
@@ -473,21 +504,30 @@ class Main extends React.Component{
             </View>
             <View style={styles.modalFooter}>
               <TouchableHighlight
-                style={[styles.buttonCreate, styles.button]}
-                onPress={() => this.handleExerciseNew()}>
-                <Text style={styles.buttonText}>Create New Exercise</Text>
-              </TouchableHighlight>
-
-              <TouchableHighlight
                 style={[styles.buttonExit, styles.button]}
                 onPress={() => this.handleExerciseAdd(exercisesAll[this.state.currentExercise].id)} >
                 <Text style={styles.buttonText}>Add Exercise to Plan</Text>
               </TouchableHighlight>
               <TouchableHighlight
+                style={[styles.buttonCreate, styles.button]}
+                onPress={() => this.handleExerciseNew()}>
+                <Text style={styles.buttonText}>Create New Exercise</Text>
+              </TouchableHighlight>
+
+
+              <TouchableHighlight
                 style={[styles.buttonExit, styles.button]}
                 onPress={() => this.setState({addExerciseModalVisible: false})} >
-                <Text style={styles.buttonText}>Cancel</Text>
+                <Text style={styles.buttonText}>Back to Plan</Text>
               </TouchableHighlight>
+              <TouchableHighlight
+                style={[styles.buttonDelete, styles.button]}
+                onPress={() => this.handleExerciseDelete(this.state.currentExercise)} >
+                <Text style={styles.buttonText}>{this.state.deleteExerciseText}</Text>
+              </TouchableHighlight>
+
+
+              <Text>{this.state.addExerciseModalMessage}</Text>
             </View>
           </View>
         </Modal>
@@ -502,34 +542,38 @@ class Main extends React.Component{
           </View>
 
             <View style={styles.form}>
-              <Text style={styles.label}>Exercise Name</Text>
-              <TextInput
-                style={{padding: 10, height: 40, borderColor: 'gray', borderWidth: 1}}
-                value={exercisesAll[this.state.currentExercise].name}
-                onChange={(e) => this.handleExerciseNameChange(exercisesAll[this.state.currentExercise].id, e)} />
-              <Text style={styles.label}>Video Link</Text>
-              <TextInput
-                style={{padding: 10, height: 40, borderColor: 'gray', borderWidth: 1}}
-                value={exercisesAll[this.state.currentExercise].video}
-                onChange={(e) => this.handleExerciseVideoChange(exercisesAll[this.state.currentExercise].id, e)} />
+              <View style={styles.formRow}>
+                <Text style={styles.label}>Exercise Name</Text>
+                <TextInput
+                  style={{padding: 10, height: 40, borderColor: 'gray', borderWidth: 1}}
+                  value={exercisesAll[this.state.currentExercise].name}
+                  onChange={(e) => this.handleExerciseNameChange(exercisesAll[this.state.currentExercise].id, e)} />
+              </View>
+              <View style={styles.formRow}>
+                <Text style={styles.label}>Video Link</Text>
+                <TextInput
+                  style={{padding: 10, height: 40, borderColor: 'gray', borderWidth: 1}}
+                  value={exercisesAll[this.state.currentExercise].video}
+                  onChange={(e) => this.handleExerciseVideoChange(exercisesAll[this.state.currentExercise].id, e)} />
+                </View>
             </View>
 
             <View style={styles.modalFooter}>
               <TouchableHighlight
                 style={[styles.buttonExit, styles.button]}
                 onPress={() => this.setState({editExerciseModalVisible: false})} >
-                <Text style={styles.buttonText}>Close Modal</Text>
+                <Text style={styles.buttonText}>Back to Plan</Text>
               </TouchableHighlight>
               <TouchableHighlight
                 style={[styles.buttonRemove, styles.button]}
                 onPress={(e) => this.handleExerciseRemove(exercisesAll[this.state.currentExercise].id, e)} >
                 <Text style={styles.buttonText}>Remove Exercise from Plan</Text>
               </TouchableHighlight>
-              {/*<TouchableHighlight
-                style={[styles.buttonExit, styles.button]}
-                onPress={() => this.setState({editExerciseModalVisible: false})} >
-                <Text style={styles.buttonText}>Close Modal</Text>
-              </TouchableHighlight>*/}
+              <TouchableHighlight
+                style={[styles.buttonDelete, styles.button]}
+                onPress={() => this.handleExerciseDelete(this.state.currentExercise)} >
+                <Text style={styles.buttonText}>{this.state.deleteExerciseText}</Text>
+              </TouchableHighlight>
             </View>
           </View>
         </Modal>

@@ -178,6 +178,12 @@ module.exports = StyleSheet.create({
   exerciseModal: {
 
   },
+  form: {
+    marginTop: 20,
+  },
+  formRow: {
+    marginBottom: 15,
+  },
   label: {
     marginBottom: 8,
     color: '#4a81a8',

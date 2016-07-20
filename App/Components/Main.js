@@ -31,7 +31,7 @@ class Main extends React.Component{
       plans: plansData,
       exercises: exerciseData,
       planModalVisible: false,
-      exerciseModalVisible: false,
+      editExerciseModalVisible: false,
       addExerciseModalVisible: false,
       // error: false,
     };
@@ -97,7 +97,7 @@ class Main extends React.Component{
     console.log(id);
     this.setState({
       currentExercise: id,
-      exerciseModalVisible: true,
+      editExerciseModalVisible: true,
     })
   }
 
@@ -184,6 +184,7 @@ class Main extends React.Component{
   }
 
   handleExerciseChange(id) {
+    console.log(id);
     this.setState({
       currentExercise: id
     });
@@ -202,6 +203,7 @@ class Main extends React.Component{
     AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
   }
   handleExerciseRemove(id, e) {
+    // Remove exercise from a plan
     let newState = this.state;
 
     newState.plans[newState.currentPlan].days[newState.currentDay].exercises.forEach((exercise, index) => {
@@ -210,12 +212,13 @@ class Main extends React.Component{
       }
     });
 
-    newState.exerciseModalVisible = false;
+    newState.editExerciseModalVisible = false;
 
     this.setState(newState);
-    // AsyncStorage.setItem('plans', JSON.stringify())
+    AsyncStorage.setItem('plans', JSON.stringify(newState.plans))
   }
   handleExerciseDelete(id) {
+    // Delete exercise globally
     let newState = this.state;
 
     // remove exercise from list of exercises
@@ -240,6 +243,40 @@ class Main extends React.Component{
     // AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
     // AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
 
+  }
+  handleExerciseNew() {
+    // Create new global exercise
+    let newState = this.state;
+
+    // new ID will be the most recent exercise's ID + 1
+    let newID = newState.exercises[newState.exercise.length-1].id + 1;
+
+    newState.exercises[newID] = {
+      id: newID,
+      name: "New Exercise",
+      video: ""
+    }
+
+    this.setState(newState);
+    // AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
+  }
+  handleExerciseAdd(id) {
+    // Add exercise to a plan
+    let newState = this.state;
+    let exerciseLength = newState.plans[newState.currentPlan].days[newState.currentDay].exercises.length;
+
+    let newExercise = {
+      id: id,
+      weight: 50,
+      sets: 3,
+      unit: "lb"
+    }
+
+    newState.plans[newState.currentPlan].days[newState.currentDay].exercises[exerciseLength] = newExercise;
+    newState.addExerciseModalVisible = false;
+
+    this.setState(newState);
+    AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
   }
   handleUnitChange(id, e) {
     let newState = this.state;
@@ -287,30 +324,30 @@ class Main extends React.Component{
     AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
   }
 
-  handleAddExercise(id, e) {
-    let newState = this.state;
-    let exerciseLength = newState.plans[newState.currentPlan].days[newState.currentDay].exercises.length;
-    let newID = this.state.exercises.length;
-
-    newState.exercises[newID] = {
-      id: newID,
-      name: "New Exercise",
-      video: ""
-    }
-
-    newState.plans[newState.currentPlan].days[newState.currentDay].exercises[exerciseLength] = {
-      id: newID,
-      weight: 50,
-      sets: 3,
-      unit: "lb"
-    }
-
-    // scroll to bottom of list view
-
-    this.setState(newState);
-    AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
-    AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
-  }
+  // handleAddExercise(id, e) {
+  //   let newState = this.state;
+  //   let exerciseLength = newState.plans[newState.currentPlan].days[newState.currentDay].exercises.length;
+  //   let newID = this.state.exercises.length;
+  //
+  //   newState.exercises[newID] = {
+  //     id: newID,
+  //     name: "New Exercise",
+  //     video: ""
+  //   }
+  //
+  //   newState.plans[newState.currentPlan].days[newState.currentDay].exercises[exerciseLength] = {
+  //     id: newID,
+  //     weight: 50,
+  //     sets: 3,
+  //     unit: "lb"
+  //   }
+  //
+  //   // scroll to bottom of list view
+  //
+  //   this.setState(newState);
+  //   AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
+  //   AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
+  // }
 
   render() {
     let plans = this.state.plans;
@@ -320,7 +357,7 @@ class Main extends React.Component{
     let currentDay = this.state.currentDay;
     let exercises = plan.days[currentDay].exercises;
 
-    // let exercisesAll = this.state.exercises;
+    let exercisesAll = this.state.exercises;
 
     let ds = new ListView.DataSource({rowHasChanged: (r1,r2) => r1 !== r2});
     let dataSource =  ds.cloneWithRows(exercises);
@@ -350,9 +387,9 @@ class Main extends React.Component{
       <Picker.Item style={styles.pickerItem} key={plan.id} label={plan.name} value={plan.id} />
     );
 
-    // let exercisePickerItems = exercisesAll.map((exercise) =>
-    //   <Picker.Item style={styles.pickerItem} key={exercise.id} label={exercise.name} value={exercise.id} />
-    // );
+    let exercisePickerItems = exercisesAll.map((exercise) =>
+      <Picker.Item style={styles.pickerItem} key={exercise.id} label={exercise.name} value={exercise.id} />
+    );
 
     return (
       <View style={styles.mainContainer}>
@@ -405,44 +442,58 @@ class Main extends React.Component{
           transparent={false} >
           <View style={[styles.addExerciseModal, styles.modal]}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalHeaderText}>Edit & Change Plans</Text>
+              <Text style={styles.modalHeaderText}>Create & Add Exercises</Text>
             </View>
             <View style={[styles.modalPickerBox, styles.mask]}>
               <Picker
                 style={styles.modalPicker}
                 mode="dropdown"
-                selectedValue={plans[currentPlan].id}
-                onValueChange={(id) => this.handlePlanChange(id)}
+                selectedValue={exercisesAll[this.state.currentExercise].id}
+                onValueChange={(id) => this.handleExerciseChange(id)}
                 >
                 {exercisePickerItems}
               </Picker>
             </View>
 
-            <View>
-              <Text style={styles.label}>Plan Name</Text>
-              <TextInput
-                style={{padding: 10, height: 40, borderColor: 'gray', borderWidth: 1}}
-                value={plan.name}
-                onChange={this.handlePlanNameChange.bind(this)} />
+            <View style={styles.form}>
+              <View style={styles.formRow}>
+                <Text style={styles.label}>Exercise Name</Text>
+                <TextInput
+                  style={{padding: 10, height: 40, borderColor: 'gray', borderWidth: 1}}
+                  value={exercisesAll[this.state.currentExercise].name}
+                  onChange={() => this.handleExerciseNameChange(exercisesAll[this.state.currentExercise].id)} />
+                </View>
+                <View style={styles.formRow}>
+                  <Text style={styles.label}>Video Link</Text>
+                  <TextInput
+                    style={{padding: 10, height: 40, borderColor: 'gray', borderWidth: 1}}
+                    value={exercisesAll[this.state.currentExercise].video}
+                    onChange={() => this.handleExerciseVideoChange(exercisesAll[this.state.currentExercise].id)} />
+                  </View>
             </View>
             <View style={styles.modalFooter}>
               <TouchableHighlight
                 style={[styles.buttonCreate, styles.button]}
-                onPress={() => this.handleNewPlan()}>
-                <Text style={styles.buttonText}>Create New Plan</Text>
+                onPress={() => this.handleExerciseNew()}>
+                <Text style={styles.buttonText}>Create New Exercise</Text>
               </TouchableHighlight>
 
               <TouchableHighlight
                 style={[styles.buttonExit, styles.button]}
-                onPress={() => this.setState({planModalVisible: false})} >
-                <Text style={styles.buttonText}>Choose Plan & Close Modal</Text>
+                onPress={() => this.handleExerciseAdd(exercisesAll[this.state.currentExercise].id)} >
+                <Text style={styles.buttonText}>Add Exercise to Plan</Text>
+              </TouchableHighlight>
+              <TouchableHighlight
+                style={[styles.buttonExit, styles.button]}
+                onPress={() => this.setState({addExerciseModalVisible: false})} >
+                <Text style={styles.buttonText}>Cancel</Text>
               </TouchableHighlight>
             </View>
           </View>
         </Modal>
         <Modal
           animationType={'slide'}
-          visible={this.state.exerciseModalVisible}
+          visible={this.state.editExerciseModalVisible}
           transparent={false}
           >
           <View style={[styles.exerciseModal, styles.modal]}>
@@ -454,29 +505,29 @@ class Main extends React.Component{
               <Text style={styles.label}>Exercise Name</Text>
               <TextInput
                 style={{padding: 10, height: 40, borderColor: 'gray', borderWidth: 1}}
-                value={this.state.exercises[this.state.currentExercise].name}
-                onChange={(e) => this.handleExerciseNameChange(this.state.exercises[this.state.currentExercise].id, e)} />
+                value={exercisesAll[this.state.currentExercise].name}
+                onChange={(e) => this.handleExerciseNameChange(exercisesAll[this.state.currentExercise].id, e)} />
               <Text style={styles.label}>Video Link</Text>
               <TextInput
                 style={{padding: 10, height: 40, borderColor: 'gray', borderWidth: 1}}
-                value={this.state.exercises[this.state.currentExercise].video}
-                onChange={(e) => this.handleExerciseVideoChange(this.state.exercises[this.state.currentExercise].id, e)} />
+                value={exercisesAll[this.state.currentExercise].video}
+                onChange={(e) => this.handleExerciseVideoChange(exercisesAll[this.state.currentExercise].id, e)} />
             </View>
 
             <View style={styles.modalFooter}>
               <TouchableHighlight
                 style={[styles.buttonExit, styles.button]}
-                onPress={() => this.setState({exerciseModalVisible: false})} >
+                onPress={() => this.setState({editExerciseModalVisible: false})} >
                 <Text style={styles.buttonText}>Close Modal</Text>
               </TouchableHighlight>
               <TouchableHighlight
                 style={[styles.buttonRemove, styles.button]}
-                onPress={(e) => this.handleExerciseRemove(this.state.exercises[this.state.currentExercise].id, e)} >
+                onPress={(e) => this.handleExerciseRemove(exercisesAll[this.state.currentExercise].id, e)} >
                 <Text style={styles.buttonText}>Remove Exercise from Plan</Text>
               </TouchableHighlight>
               {/*<TouchableHighlight
                 style={[styles.buttonExit, styles.button]}
-                onPress={() => this.setState({exerciseModalVisible: false})} >
+                onPress={() => this.setState({editExerciseModalVisible: false})} >
                 <Text style={styles.buttonText}>Close Modal</Text>
               </TouchableHighlight>*/}
             </View>
@@ -519,7 +570,7 @@ class Main extends React.Component{
               <View style={styles.addExercise}>
                 <TouchableHighlight
                   style={[styles.buttonCreate, styles.button]}
-                  onPress={(event) => this.handleAddExercise(event)} >
+                  onPress={() => this.setState({addExerciseModalVisible: true})} >
                     <Text style={styles.buttonText}>Add New Exercise</Text>
                 </TouchableHighlight>
               </View>

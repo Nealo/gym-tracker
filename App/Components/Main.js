@@ -32,6 +32,7 @@ class Main extends React.Component{
       exercises: exerciseData,
       planModalVisible: false,
       exerciseModalVisible: false,
+      addExerciseModalVisible: false,
       // error: false,
     };
   }
@@ -214,6 +215,32 @@ class Main extends React.Component{
     this.setState(newState);
     // AsyncStorage.setItem('plans', JSON.stringify())
   }
+  handleExerciseDelete(id) {
+    let newState = this.state;
+
+    // remove exercise from list of exercises
+    newState.exercises.forEach((exercise, index) => {
+      if (exercise.id === id) {
+        newState.exercises.splice(index, 1);
+      }
+    });
+
+    // remove exercise from all plans
+    newState.plans.forEach((plan, planIndex) => {
+      plan.days.forEach((day, dayIndex) => {
+        days.exercises.forEach((exercise, exerciseIndex) => {
+          if (exercise.id === id) {
+            newState.plans[planIndex].days[dayIndex].exercises.splice(exerciseIndex, 1);
+          }
+        });
+      });
+    });
+
+    this.setState(newState);
+    // AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
+    // AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
+
+  }
   handleUnitChange(id, e) {
     let newState = this.state;
 
@@ -283,7 +310,6 @@ class Main extends React.Component{
     this.setState(newState);
     AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
     AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
-
   }
 
   render() {
@@ -348,6 +374,47 @@ class Main extends React.Component{
                 onValueChange={(id) => this.handlePlanChange(id)}
                 >
                 {planPickerItems}
+              </Picker>
+            </View>
+
+            <View>
+              <Text style={styles.label}>Plan Name</Text>
+              <TextInput
+                style={{padding: 10, height: 40, borderColor: 'gray', borderWidth: 1}}
+                value={plan.name}
+                onChange={this.handlePlanNameChange.bind(this)} />
+            </View>
+            <View style={styles.modalFooter}>
+              <TouchableHighlight
+                style={[styles.buttonCreate, styles.button]}
+                onPress={() => this.handleNewPlan()}>
+                <Text style={styles.buttonText}>Create New Plan</Text>
+              </TouchableHighlight>
+
+              <TouchableHighlight
+                style={[styles.buttonExit, styles.button]}
+                onPress={() => this.setState({planModalVisible: false})} >
+                <Text style={styles.buttonText}>Choose Plan & Close Modal</Text>
+              </TouchableHighlight>
+            </View>
+          </View>
+        </Modal>
+        <Modal
+          animationType={'slide'}
+          visible={this.state.addExerciseModalVisible}
+          transparent={false} >
+          <View style={[styles.addExerciseModal, styles.modal]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalHeaderText}>Edit & Change Plans</Text>
+            </View>
+            <View style={[styles.modalPickerBox, styles.mask]}>
+              <Picker
+                style={styles.modalPicker}
+                mode="dropdown"
+                selectedValue={plans[currentPlan].id}
+                onValueChange={(id) => this.handlePlanChange(id)}
+                >
+                {exercisePickerItems}
               </Picker>
             </View>
 

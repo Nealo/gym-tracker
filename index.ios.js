@@ -21,24 +21,22 @@ import plansData from './plans.json';
 import exerciseData from './exercises.json';
 
 class WorkoutTracker extends Component {
-  // constructor(props) {
-  //   super(props);
-  // }
+  constructor(props) {
+    super(props);
+  }
 
   render() {
-    AsyncStorage.getItem('plans', (err, plans) => {
-      if (!plans) {
-        AsyncStorage.setItem('plans', JSON.stringify(plansData), () => {
-            AsyncStorage.setItem('exercises', JSON.stringify(exerciseData), () => {
-
-            });
-        });
-
-      } 
-    })
-    // if (!AsyncStorage.getItem('plans') && !AsyncStorage.getItem('exercises')) {
+    // AsyncStorage.getItem('plans', (err, plans) => {
+    //   if (!plans) {
+    //     AsyncStorage.setItem('plans', JSON.stringify(plansData), () => {
+    //         AsyncStorage.setItem('exercises', JSON.stringify(exerciseData), () => {
     //
-    // }
+    //         });
+    //     });
+    //
+    //   }
+    // })
+
     return (
       <NavigatorIOS
         style={styles.container}
@@ -46,9 +44,6 @@ class WorkoutTracker extends Component {
           title: "Tracker",
           component: Main
         }} />
-      // <View>
-      //   <Text style={styles.container}>Testing the Router</Text>
-      // </View>
     );
   }
 }
@@ -57,7 +52,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
-    // alignItems: 'center',
     backgroundColor: '#F5FCFF'
   }
 });

@@ -19,6 +19,7 @@ module.exports = StyleSheet.create({
   dayView: {
     flex: 1,
     padding: 10,
+    alignItems: 'center',
 
   },
 
@@ -33,14 +34,17 @@ module.exports = StyleSheet.create({
     color: '#4a81a8',
   },
   exerciseSection: {
-    paddingLeft: 5,
-    paddingRight: 5,
-    flex:8,
+
+
+    flex: 7,
     // marginTop: -75,
     // overflow: 'hidden',
   },
   exerciseRow: {
+    paddingLeft: 10,
+    paddingRight: 10,
     marginBottom: 40,
+
   },
   exerciseHead: {
     flex: 2,
@@ -53,13 +57,6 @@ module.exports = StyleSheet.create({
   exerciseNameText: {
     fontSize: 20,
   },
-  unitChange: {
-    flex: 1,
-  },
-  unitText: {
-    color: '#a1a1a1',
-  },
-
   videoLink: {
     flex: 1,
   },
@@ -72,9 +69,6 @@ module.exports = StyleSheet.create({
   },
   weightDisplay: {
     flex: 1,
-
-
-
   },
   weightDisplayInput: {
     height: 30,
@@ -83,21 +77,34 @@ module.exports = StyleSheet.create({
     fontWeight: '700',
     textDecorationLine: 'underline'
   },
+  unitChange: {
+    flex: 1,
+    paddingTop: 10,
+
+  },
+  unitText: {
+    color: '#a1a1a1',
+    fontWeight: "700",
+  },
   setTimes: {
+    paddingLeft: 20,
+    paddingTop: 7,
     fontWeight: "700",
     color: "#a1a1a1",
+    justifyContent: 'center',
   },
   setDisplay: {
     flex: 1,
     height:30,
-    fontSize:14,
+    fontSize:18,
     color: '#a1a1a1',
   },
   weightIncrements: {
-    flex: 2,
+    flex: 3,
     flexDirection: 'row',
   },
   weightIncrementBox: {
+    alignItems: 'center',
     flex: 1,
   },
   weightIncrement: {
@@ -150,6 +157,9 @@ module.exports = StyleSheet.create({
     marginTop: 20,
     flex: 1,
 
+  },
+  exerciseSectionFooter: {
+    flex: 1,
   },
   button: {
     // flex: 1,

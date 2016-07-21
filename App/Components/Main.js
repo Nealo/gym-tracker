@@ -23,6 +23,7 @@ import Video from './Video';
 Config = {
   deletePlanText: "Delete Plan",
   deleteExerciseText: "Delete Exercise",
+  deleteDayText: "Delete Day",
   confirmDeleteText: "Are you sure?"
 }
 
@@ -43,11 +44,13 @@ class Main extends React.Component{
       editExerciseModalVisible: false,
       addExerciseModalVisible: false,
       addExerciseModalMessage: '',
+      dayModalVisible: false,
+      dayModalMessage: '',
 
       confirmDelete: false,
       deletePlanText: Config.deletePlanText,
       deleteExerciseText: Config.deleteExerciseText,
-      // deleteDayText: "Delete Day"
+      deleteDayText: Config.deleteDayText,
       // error: false,
     };
   }
@@ -142,11 +145,10 @@ class Main extends React.Component{
       editExerciseModalVisible: true,
     });
   }
-  handleDayPress(day) {
-    let newState = this.state;
-    newState.currentDay = day;
-
-    this.setState(newState)
+  handleDayPress() {
+    this.setState({
+      dayModalVisible: true,
+    });
   }
 
   handlePlanChange(id) {
@@ -227,22 +229,62 @@ class Main extends React.Component{
 
   handleDayNew() {
     let newState = this.state;
-    let plan = newState.plans[newState.currentPlan];
-    let dayID = plan.days[plan.days.length-1].id + 1;
 
-    let newDay = {
-      id: dayID,
-      exercises: []
+    let plan = newState.plans[newState.currentPlan];
+    let daysLength = plan.days.length;
+
+    if (daysLength >= 5) {
+      this.setState({
+        dayModalMessage: "The maximum days per plan are 5."
+      });
+    } else {
+      let dayID = plan.days[daysLength-1].id + 1;
+
+      let newDay = {
+        id: dayID,
+        exercises: []
+      }
+
+      newState.plans[newState.currentPlan].days.push(newDay);
+      newState.currentDay = daysLength;
+      newState.dayModalMessage = '';
+
+      this.setState(newState);
+      AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
     }
 
-    newState.plans[newState.currentPlan].days.push(newDay);
-    newState.currentDay = dayID;
-
-    this.setState(newState);
-    AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
   }
   handleDayDelete(id) {
     let newState = this.state;
+
+    let plan = newState.plans[newState.currentPlan];
+    let daysLength = plan.days.length;
+
+    if (daysLength <= 2) {
+      this.setState({
+        dayModalMessage: "The minimum days per plan are 2."
+      })
+    } else {
+      plan.days.forEach((day, index) => {
+        if (day.id == id) {
+          newState.plans[newState.currentPlan].days.splice(index, 1);
+        }
+      });
+
+      newState.currentDay = 0;
+      newState.dayModalMessage = '';
+
+      this.setState(newState);
+      AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
+    }
+  }
+  handleDayChange(day) {
+    let newState = this.state;
+    newState.currentDay = day;
+
+    this.setState(newState)
+  }
+  handleDayMove() {
 
   }
 
@@ -275,6 +317,9 @@ class Main extends React.Component{
     AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
   }
 
+  handleExerciseMove() {
+    
+  }
   handleExerciseRemove(id, e) {
     // Remove exercise from a plan
     let newState = this.state;
@@ -465,7 +510,7 @@ class Main extends React.Component{
         return (
           <TouchableHighlight
             key={day.id}
-            onPress={() => this.handleDayPress(day.id)}
+            onPress={() => this.handleDayChange(day.id)}
             style={styles.dayView}
           >
             <View>
@@ -483,6 +528,10 @@ class Main extends React.Component{
 
     let exercisePickerItems = exercisesAll.map((exercise, index) =>
       <Picker.Item style={styles.pickerItem} key={index} label={exercise.name} value={index} />
+    );
+
+    let dayPickerItems = plan.days.map((day, index) =>
+      <Picker.Item style={styles.pickerItem} key={index} label={(index+1).toString()} value={index} />
     );
 
     return (
@@ -609,9 +658,9 @@ class Main extends React.Component{
           transparent={false}
           >
           <View style={[styles.exerciseModal, styles.modal]}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalHeaderText}>Edit Exercise</Text>
-          </View>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalHeaderText}>Edit Exercise</Text>
+            </View>
 
             <View style={styles.form}>
               <View style={styles.formRow}>
@@ -651,6 +700,64 @@ class Main extends React.Component{
             </View>
           </View>
         </Modal>
+        {/*Day Modal*/}
+        <Modal
+          animationType={'slide'}
+          visible={this.state.dayModalVisible}
+          transparent={false} >
+          <View style={[styles.dayModal, styles.modal]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalHeaderText}>Add & Delete Days</Text>
+            </View>
+            <View style={[styles.modalPickerBox, styles.mask]}>
+              <Picker
+                style={styles.modalPicker}
+                mode="dropdown"
+                selectedValue={currentDay}
+                onValueChange={(id) => this.handleDayChange(id)}
+                >
+                {dayPickerItems}
+              </Picker>
+            </View>
+
+            {/*<View style={styles.form}>
+              <View style={styles.formRow}>
+                <Text style={styles.label}>Exercise Name</Text>
+                <TextInput
+                  style={{padding: 10, height: 40, borderColor: 'gray', borderWidth: 1}}
+                  value={exercisesAll[currentExercise].name}
+                  onChange={(e) => this.handleExerciseNameChange(exercisesAll[currentExercise].id, e)} />
+              </View>
+              <View style={styles.formRow}>
+                <Text style={styles.label}>Video Link</Text>
+                <TextInput
+                  style={{padding: 10, height: 40, borderColor: 'gray', borderWidth: 1}}
+                  value={exercisesAll[currentExercise].video}
+                  onChange={(e) => this.handleExerciseVideoChange(exercisesAll[currentExercise].id, e)} />
+                </View>
+            </View>*/}
+
+            <View style={styles.modalFooter}>
+              <TouchableHighlight
+                style={[styles.buttonExit, styles.button]}
+                onPress={() => this.setState({dayModalVisible: false})} >
+                <Text style={styles.buttonText}>Back to Plan</Text>
+              </TouchableHighlight>
+            </View>
+            <View style={styles.modalBottom}>
+              <TouchableHighlight
+                style={[styles.buttonCreate, styles.button]}
+                onPress={() => this.handleDayNew()} >
+                <Text style={styles.buttonText}>Create New Day</Text>
+              </TouchableHighlight>
+              <TouchableHighlight
+                style={[styles.buttonDelete, styles.button]}
+                onPress={() => this.handleDayDelete()} >
+                <Text style={styles.buttonText}>{this.state.deleteDayText}</Text>
+              </TouchableHighlight>
+            </View>
+          </View>
+        </Modal>
 
         {/*Header Section*/}
         <View style={styles.header}>
@@ -674,9 +781,12 @@ class Main extends React.Component{
         {/*Day Section*/}
         <View style={{height: 10, flex: 1, flexDirection: "row"}}>
           <View style={styles.dayView}>
-            <Text style={[styles.dayText]}>
-              Day
-            </Text>
+            <TouchableHighlight
+              onPress={() => this.handleDayPress()} >
+              <Text style={[styles.dayText]}>
+                Day
+              </Text>
+            </TouchableHighlight>
           </View>
           {headerDays}
         </View>

@@ -528,6 +528,8 @@ class Main extends React.Component{
                 onPress={() => this.handlePlanNew()}>
                 <Text style={styles.buttonText}>Create New Plan</Text>
               </TouchableHighlight>
+            </View>
+            <View style={styles.modalBottom}>
               <TouchableHighlight
                 style={[styles.buttonDelete, styles.button]}
                 onPress={() => this.handlePlanDelete()} >
@@ -634,6 +636,8 @@ class Main extends React.Component{
                 onPress={() => this.setState({editExerciseModalVisible: false, currentExercise: 0})} >
                 <Text style={styles.buttonText}>Back to Plan</Text>
               </TouchableHighlight>
+            </View>
+            <View style={styles.modalBottom}>
               <TouchableHighlight
                 style={[styles.buttonRemove, styles.button]}
                 onPress={(e) => this.handleExerciseRemove(exercisesAll[currentExercise].id, e)} >
@@ -715,6 +719,7 @@ class Main extends React.Component{
                   <View style={styles.weightDisplay}>
                     <TextInput
                       style={styles.weightDisplayInput}
+                      maxLength={3}
                       keyboardType='numeric'
                       value={exercise.weight.toString()}
                       onChange={(event) => this.handleWeightChange(row, event)} />
@@ -728,6 +733,7 @@ class Main extends React.Component{
                   <Text style={styles.setTimes}>x</Text>
                   <TextInput
                     style={styles.setDisplay}
+                    maxLength={2}
                     keyboardType='numeric'
                     value={exercise.sets.toString()}
                     onChange={(event) => this.handleSetChange(row, event)} />

@@ -189,6 +189,8 @@ module.exports = StyleSheet.create({
 
   },
   form: {
+    paddingLeft: 10,
+    paddingRight: 10,
     marginTop: 20,
   },
   formRow: {

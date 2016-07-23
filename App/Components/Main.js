@@ -851,6 +851,7 @@ class Main extends React.Component{
                     <TextInput
                       style={styles.weightDisplayInput}
                       maxLength={3}
+                      selectTextOnFocus={true}
                       keyboardType='numeric'
                       value={exercise.weight.toString()}
                       onChange={(event) => this.handleWeightChange(row, event)} />
@@ -865,6 +866,7 @@ class Main extends React.Component{
                   <TextInput
                     style={styles.setDisplay}
                     maxLength={2}
+                    selectTextOnFocus={true}
                     keyboardType='numeric'
                     value={exercise.sets.toString()}
                     onChange={(event) => this.handleSetChange(row, event)} />

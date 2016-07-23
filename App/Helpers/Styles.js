@@ -37,11 +37,12 @@ module.exports = StyleSheet.create({
   },
   dayView: {
     flex: 1,
-    padding: 10,
-    // alignItems: 'center',
+    padding: 5,
+    alignItems: 'center',
 
   },
   dayMain: {
+    paddingLeft: 10,
     alignItems: 'flex-start',
   },
 

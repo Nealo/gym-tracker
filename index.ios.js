@@ -41,7 +41,7 @@ class WorkoutTracker extends Component {
       <NavigatorIOS
         style={styles.container}
         initialRoute={{
-          title: "Tracker",
+          title: "Weight Tracker",
           component: Main
         }} />
     );

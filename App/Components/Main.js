@@ -19,6 +19,7 @@ import styles from '../Helpers/Styles.js';
 import Plan from './Plan';
 import Cheatsheet from './Cheatsheet';
 import Video from './Video';
+import Notes from './Notes';
 
 Config = {
   deletePlanText: "Delete Plan",
@@ -51,6 +52,7 @@ class Main extends React.Component{
       deletePlanText: Config.deletePlanText,
       deleteExerciseText: Config.deleteExerciseText,
       deleteDayText: Config.deleteDayText,
+
       // error: false,
     };
   }
@@ -104,12 +106,19 @@ class Main extends React.Component{
       }
     });
   }
+  handleNotesPress() {
+    this.props.navigator.push({
+      title: "Notes",
+      component: Notes
+    });
+  }
   handleCheatsheetPress() {
     this.props.navigator.push({
       title: "Cheatsheet",
       component: Cheatsheet
     });
   }
+
   handleVideoPress(row, e) {
     let exerciseID  = this.state.plans[this.state.currentPlan].days[this.state.currentDay].exercises[row].id;
     let exercise = {};
@@ -254,7 +263,7 @@ class Main extends React.Component{
     }
 
   }
-  handleDayDelete(id) {
+  handleDayDelete() {
     let newState = this.state;
 
     let plan = newState.plans[newState.currentPlan];
@@ -265,11 +274,12 @@ class Main extends React.Component{
         dayModalMessage: "The minimum days per plan are 2."
       })
     } else {
-      plan.days.forEach((day, index) => {
-        if (day.id == id) {
-          newState.plans[newState.currentPlan].days.splice(index, 1);
-        }
-      });
+      newState.plans[newState.currentPlan].days.splice(newState.currentDay, 1);
+      // plan.days.forEach((day, index) => {
+      //   if (day.id == id) {
+      //     newState.plans[newState.currentPlan].days.splice(index, 1);
+      //   }
+      // });
 
       newState.currentDay = 0;
       newState.dayModalMessage = '';
@@ -318,7 +328,7 @@ class Main extends React.Component{
   }
 
   handleExerciseMove() {
-    
+
   }
   handleExerciseRemove(id, e) {
     // Remove exercise from a plan
@@ -570,7 +580,7 @@ class Main extends React.Component{
               <TouchableHighlight
                 style={[styles.buttonExit, styles.button]}
                 onPress={() => this.setState({planModalVisible: false, confirmDelete: false, deletePlanText: Config.deletePlanText})} >
-                <Text style={styles.buttonText}>Choose Plan</Text>
+                <Text style={styles.buttonText}>Return</Text>
               </TouchableHighlight>
               <TouchableHighlight
                 style={[styles.buttonCreate, styles.button]}
@@ -737,10 +747,14 @@ class Main extends React.Component{
                 </View>
             </View>*/}
 
+            <View style={styles.modalMessage}>
+              <Text>{this.state.dayModalMessage}</Text>
+            </View>
+
             <View style={styles.modalFooter}>
               <TouchableHighlight
                 style={[styles.buttonExit, styles.button]}
-                onPress={() => this.setState({dayModalVisible: false})} >
+                onPress={() => this.setState({dayModalVisible: false, dayModalMessage: ''})} >
                 <Text style={styles.buttonText}>Back to Plan</Text>
               </TouchableHighlight>
             </View>
@@ -761,7 +775,7 @@ class Main extends React.Component{
 
         {/*Header Section*/}
         <View style={styles.header}>
-          <View style={{padding: 5, flex: 3}}>
+          <View style={styles.headerPlan}>
               <TouchableHighlight
                 onPress={() => this.setState({planModalVisible: true})}
               >
@@ -769,18 +783,25 @@ class Main extends React.Component{
               </TouchableHighlight>
           </View>
 
-          <View style={{padding: 10,flex: 1}}>
-              <TouchableHighlight
-                onPress={() => this.handleCheatsheetPress()}
-              >
-                <Text>?</Text>
-              </TouchableHighlight>
-            </View>
+          <View style={styles.headerExtra}>
+            <TouchableHighlight
+              onPress={() => this.handleNotesPress()}
+            >
+              <Text style={styles.headerExtraText}>Notes</Text>
+            </TouchableHighlight>
+          </View>
+          <View style={styles.headerExtra}>
+            <TouchableHighlight
+              onPress={() => this.handleCheatsheetPress()}
+            >
+              <Text style={styles.headerExtraText}>?</Text>
+            </TouchableHighlight>
+          </View>
         </View>
 
         {/*Day Section*/}
-        <View style={{height: 10, flex: 1, flexDirection: "row"}}>
-          <View style={styles.dayView}>
+        <View style={styles.daySection}>
+          <View style={[styles.dayMain, styles.dayView]}>
             <TouchableHighlight
               onPress={() => this.handleDayPress()} >
               <Text style={[styles.dayText]}>

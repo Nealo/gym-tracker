@@ -12,15 +12,37 @@ module.exports = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
   },
+  headerPlan : {
+    padding: 5,
+    paddingLeft: 10,
+    flex: 3
+  },
+  headerExtra: {
+    paddingTop: 10,
+    flex: 1,
+    alignItems: 'center',
 
+  },
+  headerExtraText: {
+    fontSize: 16,
+    fontWeight: "700",
+  },
   textInput: {
     height: 30,
+  },
+  daySection: {
+    height: 10,
+    flex: 1,
+    flexDirection: "row",
   },
   dayView: {
     flex: 1,
     padding: 10,
-    alignItems: 'center',
+    // alignItems: 'center',
 
+  },
+  dayMain: {
+    alignItems: 'flex-start',
   },
 
   dayText: {
@@ -206,6 +228,10 @@ module.exports = StyleSheet.create({
     overflow: 'hidden',
     justifyContent: 'space-around'
   },
+  noteInput: {
+    flex: 1,
+    fontSize: 16,
+  }
 });
 
 function create(styles: Object): {[name: string]: number} {

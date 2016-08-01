@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
 import {
   StyleSheet,
+  Platform,
 } from 'react-native';
 
 module.exports = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    marginTop: 65,
+    marginTop: 70,
   },
   header: {
     flex: 1,
@@ -17,18 +18,32 @@ module.exports = StyleSheet.create({
     paddingLeft: 10,
     flex: 3
   },
+  planName: {
+    fontSize: 30,
+  },
   headerExtra: {
-    paddingTop: 10,
+    paddingTop: 11,
+    paddingRight: 10,
     flex: 1,
-    alignItems: 'center',
+    alignItems: 'flex-end',
 
   },
   headerExtraText: {
-    fontSize: 16,
+    fontSize: 30,
     fontWeight: "700",
+    paddingTop: 0,
+    ...Platform.select({
+      ios: {
+        paddingTop: -6,
+      },
+      // android: {
+      //   paddingTop: -10,
+      // }
+    })
   },
   textInput: {
     height: 30,
+    borderWidth: 0,
   },
   daySection: {
     height: 10,
@@ -43,18 +58,22 @@ module.exports = StyleSheet.create({
   },
   dayMain: {
     paddingLeft: 10,
+
     alignItems: 'flex-start',
   },
 
   dayText: {
-    fontSize: 24,
+    fontSize: 25,
     fontWeight: "700",
   },
   dayButton: {
 
   },
-  currentDay: {
+  dayCurrent: {
     color: '#4a81a8',
+  },
+  dayEmpty: {
+    color: '#999',
   },
   exerciseSection: {
 
@@ -66,11 +85,10 @@ module.exports = StyleSheet.create({
   exerciseRow: {
     paddingLeft: 10,
     paddingRight: 10,
-    marginBottom: 40,
+    marginBottom: 50,
 
   },
   exerciseHead: {
-    flex: 2,
     flexDirection: 'row',
     marginBottom: 20,
   },
@@ -78,64 +96,99 @@ module.exports = StyleSheet.create({
     flex: 2,
   },
   exerciseNameText: {
-    fontSize: 20,
+    fontSize: 24,
   },
   videoLink: {
+    paddingTop: 3,
+    paddingLeft: 10,
     flex: 1,
+    alignItems: 'flex-end',
+  },
+  videoImage: {
+
+    width: 26,
+    height: 26,
+
   },
   videoText: {
 
   },
   exerciseBody: {
-    flex: 3,
     flexDirection: 'row',
   },
   weightDisplay: {
-    flex: 1,
+    flex: 2,
+    paddingTop: 3,
   },
   weightDisplayInput: {
-    height: 30,
-    fontSize: 30,
+
+    fontSize: 35,
     color: '#4a81a8',
     fontWeight: '700',
-    textDecorationLine: 'underline'
+    ...Platform.select({
+      ios: {
+        height: 35,
+      },
+      android: {
+        height: 50,
+        // underlineColorAndroid: "transparent",
+      }
+    })
+    // textDecorationLine: 'underline'
   },
   unitChange: {
     flex: 1,
-    paddingTop: 10,
+    paddingTop: 12,
 
   },
   unitText: {
     color: '#a1a1a1',
     fontWeight: "700",
+    fontSize: 18,
   },
   setTimes: {
     paddingLeft: 20,
-    paddingTop: 7,
+    paddingTop: 15,
     fontWeight: "700",
     color: "#a1a1a1",
     justifyContent: 'center',
+
+    ...Platform.select({
+      android: {
+        paddingTop: 30,
+      }
+    })
   },
   setDisplay: {
+
+    paddingTop: 8,
     flex: 1,
-    height:30,
-    fontSize:18,
+
+    fontSize:24,
     color: '#a1a1a1',
+    ...Platform.select({
+      ios: {
+        height:35,
+      },
+      android: {
+        height: 50,
+      }
+    }),
   },
   weightIncrements: {
     flex: 3,
     flexDirection: 'row',
   },
   weightIncrementBox: {
-    alignItems: 'center',
+    alignItems: 'flex-end',
     flex: 1,
   },
   weightIncrement: {
     borderWidth: 2,
-    borderColor: "#888",
+    borderColor: "#666",
     borderRadius: 50,
-    padding: 6,
-    width: 34,
+    padding: 10,
+    width: 42,
   },
   addExercise: {
     flex: 1,
@@ -143,14 +196,24 @@ module.exports = StyleSheet.create({
     alignItems: 'center',
 
   },
+  scrollIndicator: {
+    alignItems: 'center',
+    padding: 10,
+    height: 50,
+    justifyContent: 'center',
+
+  },
+  scrollIndicatorImage: {
+    width: 60,
+    height: 20,
+
+  },
 
   planPage: {
     padding: 15,
     marginTop: 65,
   },
-  planName: {
-    fontSize: 26,
-  },
+
 
   picker: {
     padding: 0,
@@ -164,6 +227,7 @@ module.exports = StyleSheet.create({
   },
   modalHeader: {
     alignItems: 'center',
+    marginBottom: 10,
   },
   modalHeaderText: {
     fontSize: 24,
@@ -175,6 +239,21 @@ module.exports = StyleSheet.create({
   modal: {
     paddingTop: 30,
     flex: 1,
+  },
+  modalContent: {
+    paddingLeft: 10,
+    paddingRight: 10,
+    marginTop: 30,
+  },
+  modalListItem: {
+    marginBottom: 15,
+    fontSize: 14,
+  },
+  modalMessage: {
+    paddingLeft: 10,
+    paddingRight: 10,
+    height: 40,
+    justifyContent: 'center',
   },
   modalFooter: {
     marginTop: 20,
@@ -192,6 +271,9 @@ module.exports = StyleSheet.create({
   buttonText: {
     fontSize: 20,
     color: "#fff",
+  },
+  buttonAdd: {
+    backgroundColor: 'lightgreen'
   },
   buttonCreate: {
     backgroundColor: 'green',
@@ -222,6 +304,7 @@ module.exports = StyleSheet.create({
   label: {
     marginBottom: 8,
     color: '#4a81a8',
+    fontSize: 14,
   },
   mask: {
     // flex: 1,
@@ -229,23 +312,24 @@ module.exports = StyleSheet.create({
     overflow: 'hidden',
     justifyContent: 'space-around'
   },
+  noteImage: {
+    height:24,
+    width: 24,
+  },
   noteInput: {
     flex: 1,
     fontSize: 16,
+  },
+  notes: {
+    paddingLeft: 10,
+    paddingRight: 10,
+  },
+  webview: {
+
+    ...Platform.select({
+      android: {
+        marginTop: 65,
+      }
+    })
   }
 });
-
-function create(styles: Object): {[name: string]: number} {
-  const platformStyles = {};
-  Object.keys(styles).forEach((name) => {
-    let {ios, android, ...style} = {...styles[name]};
-    if (ios && Platform.OS === 'ios') {
-      style = {...style, ...ios};
-    }
-    if (android && Platform.OS === 'android') {
-      style = {...style, ...android};
-    }
-    platformStyles[name] = style;
-  });
-  return StyleSheet.create(platformStyles);
-}

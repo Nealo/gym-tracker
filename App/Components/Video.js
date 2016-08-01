@@ -6,8 +6,10 @@ import {
 
 class Video extends React.Component{
   render() {
+    console.log(this.props);
     return (
       <WebView
+        style={styles.webview}
         source={{uri: this.props.uri}}
       />
     );

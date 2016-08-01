@@ -47,7 +47,7 @@ class Video extends React.Component{
 
   render() {
     return (
-      <View style={styles.mainContainer}>
+      <View style={[styles.mainContainer, styles.notes]}>
         <TextInput
           style={styles.noteInput}
           value={this.state.notes}

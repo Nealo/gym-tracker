@@ -6,9 +6,11 @@ import {
 
 class Cheatsheet extends React.Component{
   render() {
+    console.log('cheat');
     return (
       <WebView
-        source={{uri: "http://www.julian.com/workout/cheatsheet"}}
+        style={styles.webview}
+        source={{uri: "https://www.julian.com/learn/muscle/program#cheat-sheet"}}
       />
     );
   }

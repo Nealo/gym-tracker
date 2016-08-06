@@ -627,7 +627,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = WorkoutTracker;
-				PROVISIONING_PROFILE = "17984e82-34b5-4cc0-97e2-4f27d0af3783";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -651,7 +651,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = WorkoutTracker;
-				PROVISIONING_PROFILE = "17984e82-34b5-4cc0-97e2-4f27d0af3783";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};

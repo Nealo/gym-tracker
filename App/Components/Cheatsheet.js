@@ -9,6 +9,7 @@ class Cheatsheet extends React.Component{
     console.log('cheat');
     return (
       <WebView
+        startInLoadingState={true}
         style={styles.webview}
         source={{uri: "https://www.julian.com/learn/muscle/program#cheat-sheet"}}
       />

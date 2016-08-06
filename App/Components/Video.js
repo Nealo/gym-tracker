@@ -9,6 +9,7 @@ class Video extends React.Component{
     console.log(this.props);
     return (
       <WebView
+        startInLoadingState={true}
         style={styles.webview}
         source={{uri: this.props.uri}}
       />

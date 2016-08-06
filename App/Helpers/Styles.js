@@ -9,6 +9,11 @@ module.exports = StyleSheet.create({
     flex: 1,
     marginTop: 70,
   },
+  loading: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   header: {
     flex: 1,
     flexDirection: "row",
@@ -16,10 +21,12 @@ module.exports = StyleSheet.create({
   headerPlan : {
     padding: 5,
     paddingLeft: 10,
-    flex: 3
+    paddingTop: 8,
+    flex: 6
   },
   planName: {
-    fontSize: 30,
+    fontSize: 24,
+    fontWeight: "700"
   },
   headerExtra: {
     paddingTop: 11,
@@ -31,6 +38,7 @@ module.exports = StyleSheet.create({
   headerExtraText: {
     fontSize: 30,
     fontWeight: "700",
+    padding:3,
     paddingTop: 0,
     ...Platform.select({
       ios: {
@@ -62,8 +70,13 @@ module.exports = StyleSheet.create({
     alignItems: 'flex-start',
   },
 
+  dayMainText: {
+    alignItems: 'flex-start',
+    fontWeight: "500",
+  },
+
   dayText: {
-    fontSize: 25,
+    fontSize: 24,
     fontWeight: "700",
   },
   dayButton: {
@@ -245,9 +258,10 @@ module.exports = StyleSheet.create({
     paddingRight: 10,
     marginTop: 30,
   },
+
   modalListItem: {
     marginBottom: 15,
-    fontSize: 14,
+    fontSize: 16,
   },
   modalMessage: {
     paddingLeft: 10,

@@ -130,7 +130,7 @@ module.exports = StyleSheet.create({
     flexDirection: 'row',
   },
   weightDisplay: {
-    flex: 2,
+    flex: 3,
     paddingTop: 3,
   },
   weightDisplayInput: {

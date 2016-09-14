@@ -25,7 +25,7 @@ class WorkoutTracker extends Component {
       <NavigatorIOS
         style={styles.container}
         initialRoute={{
-          title: "Julian.com Weight Tracker",
+          title: "Julian Gym Tracker",
           component: Main
         }} />
     );

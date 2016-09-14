@@ -13,7 +13,7 @@ class Video extends React.Component{
     super(props);
 
     this.state = {
-      notes: ""
+      notes: 'Enter any relevant workout notes here.'
     }
   }
 

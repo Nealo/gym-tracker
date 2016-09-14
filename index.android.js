@@ -26,7 +26,7 @@ class WorkoutTracker extends Component {
 
   render() {
     const routes = [
-      {title: "Julian.com Weight Tracker", index: 0},
+      {title: "Julian Gym Tracker", index: 0},
       {title: "Notes", index: 1},
       {title: "Cheatsheet", index: 2},
       {title: "Exercise Video", index: 3},

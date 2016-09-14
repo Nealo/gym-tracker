@@ -66,9 +66,6 @@ class Main extends React.Component {
       deleteExerciseText: Config.deleteExerciseText,
       deleteDayText: Config.deleteDayText,
 
-      // TO DO: CHANGE TO FALSE, CONFIRM IT WORKS ON FIRST LOAD
-      showScrollIndicator: true,
-
       planChangeText: "Return",
     };
   }
@@ -84,18 +81,31 @@ class Main extends React.Component {
       let exercises = await AsyncStorage.getItem('exercises')
 
       if (plans !== null && exercises !== null) {
-        this.setState({plans: JSON.parse(plans), exercises: JSON.parse(exercises)});
+        const currentDay = await AsyncStorage.getItem('currentDay');
+        const currentPlan = await AsyncStorage.getItem('currentPlan');
+        console.log(currentPlan);
+        console.log(currentDay);
+
+        this.setState({
+          plans: JSON.parse(plans),
+          exercises: JSON.parse(exercises),
+          currentPlan: currentPlan ? parseInt(currentPlan) : 0,
+          currentDay: currentDay ? parseInt(currentDay) : 0
+        });
       } else {
         this.setState({
           introModalVisible: true
-        }, this.fetchDataFromServer((data) => {
+        }, this.fetchDataFromServer(async (data) => {
             this.setState({
               exercises: data.exercises,
-              plans: data.plans
+              plans: data.plans,
+
             });
 
             AsyncStorage.setItem('exercises', JSON.stringify(data.exercises));
             AsyncStorage.setItem('plans', JSON.stringify(data.plans));
+            AsyncStorage.setItem('currentPlan', '0');
+            AsyncStorage.setItem('currentDay', '0');
           })
         );
       }
@@ -105,7 +115,7 @@ class Main extends React.Component {
   }
 
   fetchDataFromServer(cb) {
-    fetch('https://cdn.rawgit.com/julianshapiro/julian.com/e170813d8b187093bde59d88a5d7fbc6c0c7a60e/muscle/workout.json', )
+    fetch(`https://www.julian.com/learn/muscle/workouts.json?${Date.now()}`, )
       .then((res) => {
         return res.json();
       })
@@ -117,27 +127,6 @@ class Main extends React.Component {
       .catch((error, x) => {
         console.log(error);
       });
-  }
-
-  toggleScrollIndicator() {
-    console.log('hello');
-    // this.setState({
-    //   showScrollIndicator: !this.state.showScrollIndicator
-    // })
-  }
-
-  renderScrollIndicator() {
-    if (this.state.showScrollIndicator) {
-      return (
-        <View style={styles.scrollIndicator}>
-          <Image
-            style={styles.scrollIndicatorImage}
-            source={require('../Assets/Images/arrow.png')} />
-        </View>
-      );
-    } else {
-      return null;
-    }
   }
 
   createPickerItems(array) {
@@ -216,14 +205,18 @@ class Main extends React.Component {
       confirmDelete: false,
       deletePlanText: Config.deletePlanText,
     });
+    AsyncStorage.setItem('currentPlan', `${id}`);
+    AsyncStorage.setItem('currentDay', `${currentDay}`);
   }
   handlePlanNameChange(e) {
-    let newPlan = this.state.plans[this.state.currentPlan];
-    newPlan.name = e.nativeEvent.text;
+    let plans = this.state.plans;
+
+    plans[this.state.currentPlan].name = e.nativeEvent.text;
 
     this.setState({
-      plan: newPlan
+      plans: plans
     });
+
     AsyncStorage.setItem('plans', JSON.stringify(this.state.plans))
   }
   handlePlanNew() {
@@ -253,15 +246,15 @@ class Main extends React.Component {
       ]
     }
 
-    newState.plans.push(newPlan);
-    // current plan is the new plan's index
-    newState.currentPlan = plansLength;
-    newState.confirmDelete = false;
-    newState.deletePlanText = Config.deletePlanText;
-    newState.planChangeText = Config.planChangeText;
-
-    this.setState(newState);
+    this.setState({
+      plans: newState.plans,
+      currentPlan: plansLength,
+      confirmDelete: false,
+      deletePlanText: Config.deletePlanText,
+      planChangeText: Config.planChangeText,
+    })
     AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
+    AsyncStorage.setItem('currentPlan', `${plansLength}`);
   }
   handlePlanDelete(id) {
     if (!this.state.confirmDelete) {
@@ -272,16 +265,19 @@ class Main extends React.Component {
     } else {
       let newState = this.state;
       let name = newState.plans[newState.currentPlan].name;
+      let newPlanIndex = newState.plans.length - 1;
 
       newState.plans.splice(newState.currentPlan, 1)
 
-      newState.currentPlan = newState.plans.length - 1;
-      newState.confirmDelete = false;
-      newState.deletePlanText = Config.deletePlanText;
-      newState.planModalMessage = `"${name}" deleted.`;
-
-      this.setState(newState);
+      this.setState({
+        plans: newState.plans,
+        currentPlan: newPlanIndex,
+        confirmDelete: false,
+        deletePlanText: Config.deletePlanText,
+        planModalMessage: `"${name}" deleted.`,
+      })
       AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
+      AsyncStorage.setItem('currentPlan', `${newPlanIndex}`);
     }
   }
 
@@ -304,12 +300,13 @@ class Main extends React.Component {
         exercises: []
       }
 
-      newState.plans[newState.currentPlan].days.push(newDay);
-      newState.currentDay = daysLength;
-      newState.dayModalMessage = '';
-
-      this.setState(newState);
+      this.setState({
+        plans: newState.plans,
+        currentDay: daysLength,
+        dayModalMessage: '',
+      })
       AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
+      AsyncStorage.setItem('currentDay', `${daysLength}`);
     }
   }
 
@@ -332,36 +329,36 @@ class Main extends React.Component {
       } else {
         newState.plans[newState.currentPlan].days.splice(newState.currentDay, 1);
 
-        newState.currentDay = 0;
-        newState.dayModalMessage = '';
-        newState.deleteDayText = Config.deleteDayText;
-        newState.confirmDelete = false;
-
-        this.setState(newState);
+        this.setState({
+          plans: newState.plans,
+          currentDay: 0,
+          dayModalMessage: '',
+          deleteDayText: Config.deleteDayText,
+          confirmDelete: false,
+        })
         AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
+        AsyncStorage.setItem('currentDay', '0');
       }  // confirmDelete
     } // daysLength <= 2
   }
   handleDayChange(day) {
-    let newState = this.state;
-
-    newState.currentDay = day;
-
-    newState.deleteDayText = Config.deleteDayText;
-    newState.confirmDelete = false;
-
-    console.log(this.state);
-
-    this.setState(newState);
+    this.setState({
+      currentDay: day,
+      deleteDayText: Config.deleteDayText,
+      confirmDelete: false,
+    });
+    AsyncStorage.setItem('currentDay', `${day}`);
   }
   handleDayNameChange(e) {
     let newState = this.state;
 
     newState.plans[newState.currentPlan].days[newState.currentDay].name = e.nativeEvent.text;
-    newState.deleteDayText = Config.deleteDayText;
-    newState.confirmDelete = false;
 
-    this.setState(newState);
+    this.setState({
+      plans: newState.plans,
+      deleteDayText: Config.deleteDayText,
+      confirmDelete: false,
+    });
     AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
   }
 
@@ -381,7 +378,9 @@ class Main extends React.Component {
       }
     });
 
-    this.setState(newState);
+    this.setState({
+      exercises: newState.exercises,
+    })
     AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
   }
   handleExerciseVideoChange(id, e) {
@@ -395,15 +394,15 @@ class Main extends React.Component {
         url = 'https://' + url;
       }
 
-      console.log(url);
-
       newState.exercises.forEach((exercise, index) => {
         if (exercise.id === id) {
           newState.exercises[index].video = url;
         }
       })
 
-      this.setState(newState);
+      this.setState({
+        exercises: newState.exercises,
+      })
       AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
     }
 
@@ -420,12 +419,13 @@ class Main extends React.Component {
       }
     });
 
-    newState.editExerciseModalVisible = false;
-    newState.confirmDelete = false;
-    newState.deleteExerciseText = Config.deleteExerciseText;
-    newState.currentExercise = 0;
-
-    this.setState(newState);
+    this.setState({
+      plans: newState.plans,
+      editExerciseModalVisible: false,
+      confirmDelete: false,
+      deleteExerciseText: Config.deleteExerciseText,
+      currentExercise: 0,
+    })
     AsyncStorage.setItem('plans', JSON.stringify(newState.plans))
   }
   handleExerciseDelete(id) {
@@ -458,14 +458,15 @@ class Main extends React.Component {
         });
       });
 
-      newState.confirmDelete = false;
-      newState.deleteExerciseText = Config.deleteExerciseText;
-      newState.currentExercise = 0;
-      newState.addExerciseModalMessage = `"${name}" deleted.`;
-
-      newState.editExerciseModalVisible = false;
-
-      this.setState(newState);
+      this.setState({
+        plans: newState.plans,
+        exercises: newState.exercises,
+        confirmDelete: false,
+        deleteExerciseText: Config.deleteExerciseText,
+        currentExercise: 0,
+        addExerciseModalMessage: `"${name}" deleted.`,
+        editExerciseModalVisible: false,
+      })
       AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
       AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
     }
@@ -484,17 +485,13 @@ class Main extends React.Component {
       video: "https://"
     }
 
-    console.log(newState.exercises)
-    console.log(newID);
-    console.log(newState.exercises[newID]);
-    console.log('currentExercise', exercisesLength);
-
-    newState.currentExercise = exercisesLength;
-    newState.confirmDelete = false;
-    newState.deleteExerciseText = Config.deleteExerciseText;
-    newState.addExerciseModalMessage = "New exercise created!";
-
-    this.setState(newState);
+    this.setState({
+      exercises: newState.exercises,
+      currentExercise: exercisesLength,
+      confirmDelete: false,
+      deleteExerciseText: Config.deleteExerciseText,
+      addExerciseModalMessage: "New exercise created!",
+    })
     AsyncStorage.setItem('exercises', JSON.stringify(newState.exercises));
   }
   handleExerciseAdd(id) {
@@ -524,11 +521,13 @@ class Main extends React.Component {
       }
 
       newState.plans[newState.currentPlan].days[newState.currentDay].exercises.push(newExercise);
-      newState.addExerciseModalMessage = `"${this.getExercise(id).name}" added to plan.`
-      newState.confirmDelete = false;
-      newState.deleteExerciseText = Config.deleteExerciseText;
 
-      this.setState(newState);
+      this.setState({
+        plans: newState.plans,
+        addExerciseModalMessage: `"${this.getExercise(id).name}" added to plan.`,
+        confirmDelete: false,
+        deleteExerciseText: Config.deleteExerciseText,
+      })
       AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
     }
   }
@@ -538,7 +537,9 @@ class Main extends React.Component {
 
     newState.plans[newState.currentPlan].days[newState.currentDay].exercises[id].unit = newState.plans[newState.currentPlan].days[newState.currentDay].exercises[id].unit === "lb" ? "kg" : "lb";
 
-    this.setState(newState);
+    this.setState({
+      plans: newState.plans,
+    })
     AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
   }
   handleWeightChange(id, e) {
@@ -546,13 +547,25 @@ class Main extends React.Component {
     // Handle blank input
     let newWeight = e.nativeEvent.text ? e.nativeEvent.text : '';
     // Only parse if not blank
-    newWeight = newWeight ? parseFloat(newWeight) : newWeight;
-    // Keeps from starting with a non-number
+
+    if (newWeight) {
+      if (newWeight.slice(-1) === '.') {
+      } else {
+        newWeight = parseFloat(newWeight);
+      }
+
+    } else {
+      // Keeps from starting with a non-number
+      newWeight = '';
+    }
+
     newWeight = newWeight ? newWeight : '';
 
     newState.plans[newState.currentPlan].days[newState.currentDay].exercises[id].weight = newWeight;
 
-    this.setState(newState);
+    this.setState({
+      plans: newState.plans,
+    })
     AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
   }
   handleSetChange(id, e) {
@@ -564,7 +577,9 @@ class Main extends React.Component {
 
     newState.plans[newState.currentPlan].days[newState.currentDay].exercises[id].sets = newSets;
 
-    this.setState(newState);
+    this.setState({
+      plans: newState.plans,
+    })
     AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
   }
   handleWeightIncrement(id, increment) {
@@ -575,7 +590,9 @@ class Main extends React.Component {
 
     newState.plans[newState.currentPlan].days[newState.currentDay].exercises[id].weight = parseFloat((newWeight + increment).toFixed(2));
 
-    this.setState(newState);
+    this.setState({
+      plans: newState.plans,
+    })
     AsyncStorage.setItem('plans', JSON.stringify(newState.plans));
   }
 
@@ -623,7 +640,7 @@ class Main extends React.Component {
           <View style={styles.weightDisplay}>
             <TextInput
               style={styles.weightDisplayInput}
-              maxLength={3}
+              maxLength={5}
               selectTextOnFocus={true}
               keyboardType='numeric'
               value={exercise.weight.toString()}
@@ -673,12 +690,6 @@ class Main extends React.Component {
 
       let exercises = plan.days[currentDay].exercises;
       let exercisesAll = this.state.exercises;
-
-      console.log(exercisesAll);
-      console.log('length', exercisesAll.length)
-      console.log('current',currentExercise);
-      console.log(exercisesAll[currentExercise]);
-
 
       let ds = new ListView.DataSource({rowHasChanged: (r1,r2) => r1 !== r2});
       let dataSource =  ds.cloneWithRows(exercises);
@@ -1138,7 +1149,7 @@ class CheatSheetLink extends React.Component {
   handleCheatsheetPress() {
     if (Platform.OS == 'ios') {
       this.props.navigator.push({
-        title: "Cheatsheet",
+        title: "Cheat Sheet",
         component: Cheatsheet
       });
     } else {
@@ -1177,22 +1188,14 @@ class ModalIntro extends Main {
         transparent={false} >
         <View style={[styles.modal, styles.introModal]}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalHeaderText}>Welcome to Weight Tracker!</Text>
+            <Text style={styles.modalHeaderText}>Welcome!</Text>
           </View>
           <View style={styles.modalContent}>
-            <Text style={styles.modalListItem}>Each workout "plan" contains several days worth of exercises. Each exercise listed for that plan's day has a corresponding video link, last achieved weight (lb and kg), number of sets, and +1 and +5 weight increments.</Text>
-            <Text style={styles.modalListItem}>Everything is clickable and changable—the plan name, "Days", days, exercise names, video links, weights, sets, and lb/kg.</Text>
-            <Text style={styles.modalListItem}>Write notes or view the Julian.com muscle building cheatsheet by clicking the buttons in the top right.</Text>
+            <Text style={styles.modalListItem}>This app consists of workout plans. Each plan has 1-3 days worth of exercises to do in a week.</Text>
+            <Text style={styles.modalListItem}>For each exercise, this app lets you track how much weight you’re lifting.</Text>
+            <Text style={styles.modalListItem}>Everything in the main screen is clickable and changeable — the plan, workout days, exercises, video links, sets, and even lb/kg. So fool around and customize everything to your desire.</Text>
+            <Text style={styles.modalListItem}>You can view the Julian.com Muscle cheat sheet by clicking the question mark in the top right of the main screen.</Text>
 
-            {/*<Text style={styles.modalListItem}>Change, rename, or create new plans by tapping the plan name in the top left corner.</Text>
-            <Text style={styles.modalListItem}>Edit, remove, or permanently delete an exercise by tapping the exercise's name in the list.</Text>
-            <Text style={styles.modalListItem}>Add/remove, create/delete, or edit exercises by tapping "Add New Exercises" at the bottom of the exercise list. </Text>
-            <Text style={styles.modalListItem}>Add, remove, or rename "days" by tapping on the word "Day."</Text>
-            <Text style={styles.modalListItem}>Change an exercise's weight by either tapping the weight and typing it in, or by taping the +1 and +5 increment buttons.</Text>
-            <Text style={styles.modalListItem}>Swap units by tapping "lb" or "kg."</Text>
-            <Text style={styles.modalListItem}>Change number of sets on an exercise by tapping on "x3."</Text>
-            <Text>Click the notes button in the top right corner for a page of free-form notes</Text>
-            <Text>Click the ? button for a link to the Julian.com cheatsheet</Text>*/}
           </View>
           <View style={styles.modalFooter}>
             <TouchableHighlight

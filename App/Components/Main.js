@@ -83,8 +83,6 @@ class Main extends React.Component {
       if (plans !== null && exercises !== null) {
         const currentDay = await AsyncStorage.getItem('currentDay');
         const currentPlan = await AsyncStorage.getItem('currentPlan');
-        console.log(currentPlan);
-        console.log(currentDay);
 
         this.setState({
           plans: JSON.parse(plans),
@@ -146,17 +144,6 @@ class Main extends React.Component {
 
     return exercise;
   }
-  // getExerciseName(id) {
-  //   let name = '';
-  //
-  //   this.state.exercises.forEach((exercise) => {
-  //     if (exercise.id == id) {
-  //       name = exercise.name;
-  //     }
-  //   })
-  //
-  //   return name;
-  // }
 
   handlePlanPress() {
     this.setState({
@@ -671,7 +658,7 @@ class Main extends React.Component {
   }
 
   render() {
-    let plans = this.state.plans;
+    let {plans} = this.state;
     // AsyncStorage.removeItem('plans');
     // AsyncStorage.removeItem('exercises')
 
@@ -682,13 +669,11 @@ class Main extends React.Component {
         </View>
       )
     } else {
-      let currentPlan = this.state.currentPlan;
-      let currentExercise = this.state.currentExercise;
-      let currentDay = this.state.currentDay;
+      let { currentPlan, currentExercise, currentDay } = this.state;
 
       let plan = plans[currentPlan];
 
-      let exercises = plan.days[currentDay].exercises;
+      let {exercises} = plan.days[currentDay];
       let exercisesAll = this.state.exercises;
 
       let ds = new ListView.DataSource({rowHasChanged: (r1,r2) => r1 !== r2});

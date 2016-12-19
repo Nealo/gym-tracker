@@ -28,7 +28,7 @@ class Video extends React.Component{
       if (notes !== null) {
         this.setState({notes: notes});
       } else {
-        console.log("null");
+        console.log("notes are null");
       }
     } catch (error) {
       console.log(this.state);

@@ -689,7 +689,8 @@ class Main extends React.Component {
           <Modal
             animationType={'slide'}
             visible={this.state.planModalVisible}
-            transparent={false} >
+            transparent={false}
+            onRequestClose={() => {}} >
             <ScrollView style={[styles.planModal, styles.modal]}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalHeaderText}>Edit & Change Plans</Text>
@@ -743,7 +744,8 @@ class Main extends React.Component {
           <Modal
             animationType={'slide'}
             visible={this.state.addExerciseModalVisible}
-            transparent={false} >
+            transparent={false}
+            onRequestClose={() => {}} >
             <ScrollView style={[styles.addExerciseModal, styles.modal]}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalHeaderText}>Create & Add Exercises</Text>
@@ -808,7 +810,7 @@ class Main extends React.Component {
             animationType={'slide'}
             visible={this.state.editExerciseModalVisible}
             transparent={false}
-            >
+            onRequestClose={() => {}} >
             <ScrollView style={[styles.exerciseModal, styles.modal]}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalHeaderText}>Edit Exercise</Text>
@@ -856,7 +858,8 @@ class Main extends React.Component {
           <Modal
             animationType={'slide'}
             visible={this.state.dayModalVisible}
-            transparent={false} >
+            transparent={false}
+            onRequestClose={() => {}} >
             <ScrollView style={[styles.dayModal, styles.modal]}>
               <View style={styles.modalHeader}>
                 <Text style={styles.modalHeaderText}>Add & Delete Days</Text>
@@ -1159,7 +1162,6 @@ class CheatSheetLink extends React.Component {
   }
 }
 
-
 class ModalIntro extends Main {
   constructor(props) {
     super(props);
@@ -1170,7 +1172,8 @@ class ModalIntro extends Main {
       <Modal
         animationType={'slide'}
         visible={this.state.introModalVisible}
-        transparent={false} >
+        transparent={false}
+        onRequestClose={() => {}} >
         <View style={[styles.modal, styles.introModal]}>
           <View style={styles.modalHeader}>
             <Text style={styles.modalHeaderText}>Welcome!</Text>

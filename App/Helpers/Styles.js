@@ -143,7 +143,7 @@ module.exports = StyleSheet.create({
         height: 35,
       },
       android: {
-        height: 50,
+        height: 60,
         // underlineColorAndroid: "transparent",
       }
     })
@@ -159,32 +159,36 @@ module.exports = StyleSheet.create({
     fontWeight: "700",
     fontSize: 18,
   },
-  setTimes: {
-    paddingLeft: 20,
-    paddingTop: 15,
-    fontWeight: "700",
-    color: "#a1a1a1",
-    justifyContent: 'center',
+  setTimesWrap: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingRight: 20,
 
     ...Platform.select({
+      ios: {
+        height:35,
+      },
       android: {
-        paddingTop: 30,
+        height: 60,
       }
-    })
+    }),
+  },
+  setTimes: {
+    fontWeight: "700",
+    color: "#a1a1a1",
   },
   setDisplay: {
-
     paddingTop: 8,
     flex: 1,
 
-    fontSize:24,
+    fontSize: 24,
     color: '#a1a1a1',
     ...Platform.select({
       ios: {
         height:35,
       },
       android: {
-        height: 50,
+        height: 63,
       }
     }),
   },

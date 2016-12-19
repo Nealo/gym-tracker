@@ -639,7 +639,9 @@ class Main extends React.Component {
               onPress={(event) => this.handleUnitChange(row, event)}>
               <Text style={styles.unitText}>{exercise.unit}</Text>
             </TouchableHighlight>
-          <Text style={styles.setTimes}>x</Text>
+          <View style={styles.setTimesWrap}>
+            <Text style={styles.setTimes}>x</Text>
+          </View>
           <TextInput
             style={styles.setDisplay}
             maxLength={2}
@@ -988,7 +990,6 @@ class Header extends Main {
     );
   }
 }
-
 
 class DaySection extends React.Component {
   constructor(props) {
